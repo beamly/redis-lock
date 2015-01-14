@@ -48,7 +48,7 @@ function acquireLock(client, lockName, timeout, retryDelay, onLockAquired) {
 	});
 }
 
-module.exports = function(client, retryDelay) {
+module.exports = function(client, retryDelay, keyPrefix) {
 	if(!(client && client.setnx)) {
 		throw new Error("You must specify a client instance of http://github.com/mranney/node_redis");
 	}
@@ -65,7 +65,7 @@ module.exports = function(client, retryDelay) {
 			timeout = 5000;
 		}
 
-		lockName = "lock." + lockName;
+		lockName = (keyPrefix ? keyPrefix : "") + "lock." + lockName;
 
 		acquireLock(client, lockName, timeout, retryDelay, function(lockTimeoutValue) {
 			taskToPerform(function(done) {

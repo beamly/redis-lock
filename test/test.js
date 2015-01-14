@@ -1,6 +1,7 @@
 var should = require("should"),
 	redisClient = require("redis").createClient(),
-	lock = require("../index")(redisClient);
+	lock = require("../index")(redisClient),
+	lockWithPrefix = require("../index")(redisClient, null, "testPrefix:");
 
 describe("redis-lock", function() {
 	it("should aquire a lock and call the callback", function(done) {
@@ -61,4 +62,22 @@ describe("redis-lock", function() {
 			done();
 		});
 	});
+
+	it("should use a key prefix where one is given", function(done) {
+		lockWithPrefix("testLock", function(completed) {
+			redisClient.get("testPrefix:lock.testLock", function(err, timeStamp) {
+				if(err) throw err;
+
+				parseFloat(timeStamp).should.be.above(Date.now());
+
+				completed(function() {
+					redisClient.get("testPrefix:lock.testLock", function(err, lockValue) {
+						should.not.exist(lockValue);
+						done();
+					});
+				});
+			});
+		});
+	});
+
 });

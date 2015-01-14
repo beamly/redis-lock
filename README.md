@@ -56,8 +56,10 @@ To initialize redis-lock, simply call it by passing in a redis client instance, 
 
 You can also provide a second (optional) parameter: `retryDelay`. If due to any reason a lock couldn't be acquired, lock aquisition is retried after waiting for a little bit of time. `retryDelay` lets you control this delay time. Default: 50ms.
 
+You can also provide a third (optional) parameter: `keyPrefix`. This will prefix any generated redis key with the specified string.
+
 ```javascript
-var lock = require("redis-lock")(require("redis").createClient(), 10);
+var lock = require("redis-lock")(require("redis").createClient(), 10, "testPrefix:");
 ```
 
 This will return a function called (say) ``lock``, described below:
